@@ -1,10 +1,14 @@
-
-import logging
+from datetime import datetime
+import pytz
 import time
+import logging
 import datetime as dt
 from kiteconnect import KiteConnect
 import threading
 import os
+
+# Set timezone to IST (Asia/Kolkata)
+india = pytz.timezone('Asia/Kolkata')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - %(message)s')
@@ -21,6 +25,17 @@ STOP_LOSS = 315
 TRAIL_SL = 365
 TARGET_1 = 460
 TARGET_2 = 465
+
+def wait_until_10_am():
+    logging.info("Waiting for 10:00 AM IST...")
+    while True:
+        now = datetime.now(india)
+        if now.hour < 10:
+            logging.info(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Waiting for 10:00 AM...")
+            time.sleep(60)
+        else:
+            logging.info(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] ✅ Time crossed 10:00 AM! Starting trade monitoring...")
+            break
 
 def fetch_instruments():
     instruments = kite.instruments("NSE")
@@ -102,4 +117,5 @@ def monitor_options():
 
 if __name__ == "__main__":
     logging.info("Starting BankNifty Paper Trading Bot...")
+    wait_until_10_am()
     monitor_options()
