@@ -1,1 +1,2 @@
-kiteconnect==4.1.0
+pytz
+kiteconnect
