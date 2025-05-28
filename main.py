@@ -7,7 +7,29 @@ import threading
 import os
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s] - %(message)s')
+
+import pytz
+import datetime as dt_module  # For logging time formatting
+
+# Set Indian timezone
+india_tz = pytz.timezone("Asia/Kolkata")
+
+# Custom formatter to use IST
+class ISTFormatter(logging.Formatter):
+    def formatTime(self, record, datefmt=None):
+        dt = dt_module.datetime.fromtimestamp(record.created, india_tz)
+        if datefmt:
+            return dt.strftime(datefmt)
+        else:
+            return dt.isoformat()
+
+formatter = ISTFormatter('[%(asctime)s] - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+logger.propagate = False
 
 API_KEY = os.getenv("API_KEY")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
